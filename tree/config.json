@@ -1,0 +1,9 @@
+{
+    "acceptance_rate_vector": "tree/acceptance-rate-vector.pt",
+    "max_depth": 24,
+    "max_budget": 1024,
+    "draft_time": 0.027,
+    "valid_budget": [512, 640, 768, 896, 1024],
+    "target_time":[1.066,1.134, 1.1408,1.1459,1.1907],
+    "dst": "tree/1024.pt"
+}
