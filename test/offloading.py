@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument('--dataset', type=str, default='gs', help='dataset')
     parser.add_argument('--temp', type=float, default=0.6, help='temperature')
     parser.add_argument('--top_p', type=float, default=0.9, help='top p')
-    parser.add_argument('--budget', type=float, default=0.1)
+    parser.add_argument('--budget', type=int, default=8192, help='budget')
     parser.add_argument('--draft_cache_budget', type=int, default=256, help='draft cache budget')
     parser.add_argument('--chunk_size', type=int, default=8, help='chunk size')
     args = parser.parse_args()
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     verbose = args.verbose
 
     chunk_size = args.chunk_size
-    max_budget = int(args.budget * prefill) // chunk_size * chunk_size
+    max_budget = args.budget
 
     print_config(draft, target, prefill, gen_len, gamma, top_k, top_p, temperature, file_path=None, method="TriForce (Offloading)", spec_args={'budget': args.budget, 'chunk_size': chunk_size}, dataset=args.dataset)
 
@@ -95,36 +95,36 @@ if __name__ == "__main__":
     print(colored(f"tokenized_prompts length: {len(tokenized_prompts)}", "green"))
 
     ######## Warm up for baseline ########
-    n_warmups = 1
-    input_ids = tokenized_prompts[0].to(target.device)[:,:prefill]
-    for i in tqdm(range(n_warmups), desc="Autoregressive Warmup"):
-        Autoregressive(tokenizer, graph_engine, input_ids, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose)
+    # n_warmups = 1
+    # input_ids = tokenized_prompts[0].to(target.device)[:,:prefill]
+    # for i in tqdm(range(n_warmups), desc="Autoregressive Warmup"):
+    #     Autoregressive(tokenizer, graph_engine, input_ids, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose)
 
-    all_speed = []
-    for input_ids in tqdm(tokenized_prompts[:1], desc="Autoregressive Test"):
-        input_ids = input_ids.to(target.device)[:,:prefill]
-        speed = Autoregressive(tokenizer, graph_engine, input_ids, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose)
-        all_speed.append(speed)
+    # all_speed = []
+    # for input_ids in tqdm(tokenized_prompts[:1], desc="Autoregressive Test"):
+    #     input_ids = input_ids.to(target.device)[:,:prefill]
+    #     speed = Autoregressive(tokenizer, graph_engine, input_ids, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose)
+    #     all_speed.append(speed)
 
-    baseline_latency = 1000/(sum(all_speed) / len(all_speed))
-    print(colored(f"[Autoregressive] average latency: {baseline_latency} ms", "red"))
+    # baseline_latency = 1000/(sum(all_speed) / len(all_speed))
+    # print(colored(f"[Autoregressive] average latency: {baseline_latency} ms", "red"))
 
     ######## Warm up for TriForce ########
-    n_warmups = 3
-    input_ids = tokenized_prompts[0].to(target.device)[:,:prefill]
-    for i in tqdm(range(n_warmups), desc="TriForce Warmup"):
-        TriForce(tokenizer, graph_engine, input_ids, gamma=gamma, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose, file_path=None, dataset=args.dataset, spec_args={'budget': args.budget, 'draft': args.draft, 'chunk_size': chunk_size, 'baseline': baseline_latency/1000})
+    # n_warmups = 3
+    # input_ids = tokenized_prompts[0].to(target.device)[:,:prefill]
+    # for i in tqdm(range(n_warmups), desc="TriForce Warmup"):
+    #     TriForce(tokenizer, graph_engine, input_ids, gamma=gamma, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose, file_path=None, dataset=args.dataset, spec_args={'budget': args.budget, 'draft': args.draft, 'chunk_size': chunk_size, 'baseline': baseline_latency/1000})
 
     all_acceptance_rate = []
     all_speed = []
     for input_ids in tqdm(tokenized_prompts, desc="TriForce Test"):
         input_ids = input_ids.to(target.device)[:,:prefill]
 
-        acceptance_rate, speed = TriForce(tokenizer, graph_engine, input_ids, gamma=gamma, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose, file_path=None, dataset=args.dataset, spec_args={'budget': args.budget, 'draft': args.draft, 'chunk_size': chunk_size, 'gamma': gamma, 'temperature': temperature, 'top_p': top_p, 'baseline': baseline_latency/1000})
+        acceptance_rate, speed = TriForce(tokenizer, graph_engine, input_ids, gamma=gamma, max_len=gen_len, top_k=top_k, top_p=top_p, temperature=temperature, verbose=verbose, file_path=None, dataset=args.dataset, spec_args={'budget': args.budget, 'draft': args.draft, 'chunk_size': chunk_size, 'gamma': gamma, 'temperature': temperature, 'top_p': top_p})
         all_acceptance_rate.append(acceptance_rate)
         all_speed.append(speed)
 
     method_latency = 1000/(sum(all_speed) / len(all_speed))
     print(colored(f"average acceptance rate (NOT per token): {sum(all_acceptance_rate) / len(all_acceptance_rate)}", "red"))
     print(colored(f"[TriForce] average latency: {method_latency} ms", "red"))
-    print(colored(f"[E2E Speedup]: {baseline_latency / method_latency}", "red"))
+    # print(colored(f"[E2E Speedup]: {baseline_latency / method_latency}", "red"))

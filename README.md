@@ -29,7 +29,7 @@
 <br>
 
 <div align="center">
-<img src="static/images/sys.png" align="top"/>
+<img src="static/images/Sys_readme.png" align="top"/>
 <figcaption>TriForce Framework</figcaption>
 </div>
 
@@ -46,50 +46,63 @@ Currently, only long-context Llama models are supported (including [Llama2-7B-12
 On-chip results can be reproduced on A100 by running the following command. `--prefill` specifies the context length of prompt and `--budget` specifies the budget of retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters. `gamma` is the number of speculative decoding steps.
 
 ```bash
-# w/ CUDA Graph
+# TriForce w/ Hierarchy, on A100
 CUDA_VISIBLE_DEVICES=0 python test/on_chip.py --prefill 124928 --budget 4096 \
  --chunk_size 8 --top_p 0.9 --temp 0.6 --gamma 6
 ```
 
-### Offloading
-For the offloading setting, we provide two implementations: TriForce w/ [Seqouia](https://github.com/Infini-AI-Lab/Sequoia) and TriForce w/o Seqouia. The difference between them is that the former uses Seqouia for tree attention (sometimes Seqouia will be early terminated due to numerical instability of the model when calculating the probility residual, leading to inaccurate results), while the latter uses the vanilla attention. The performance of offloading significantly relies on bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
-
-`--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The default tree size for Seqouia is set to 512.
-
-```bash
-# TriForce w/ Seqouia
-CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
-test/offloading_seqouia.py --budget 12288 --prefill 130048 \
---dataset demo --target llama-7B-128K --on_chip 9 --seed 1
-
-# TriForce w/ CUDA Graph
-CUDA_VISIBLE_DEVICES=0 python test/offloading.py --prefill 130048  \
---chunk_size 8 --temp 0.6 --top_p 0.9 --gamma 16 --dataset 128k \
---budget 0.1
-```
-
 ### Offloading with Tensor Parallelism
-Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX-4090s do not support CUDA Graph for tensor parallelism (A100 supports). Therefore, we disabled CUDA Graph for this setting.
+For the offloading setting,  we provides two distinct variants of TriForce: TriForce-Tree and TriForce-Hierarchy. TriForce-Tree drafts with tree attention, while TriForce-Hierarchy drafts hierarchically. The difference between them is that the former uses [Seqouia](https://github.com/Infini-AI-Lab/Sequoia) for tree attention, while the latter uses the vanilla attention with hierarchical speculations. The performance of offloading significantly relies on bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
+
+Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX-4090s do not support CUDA Graph for tensor parallelism (while A100 supports). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The default tree size is set to 512. 
 
 ```bash
-# TriForce w/ Seqouia w/o CUDA Graph
+# TriForce w/ Hierarchy
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
-test/offloading_seqouia.py --budget 12288 --prefill 130048 --dataset demo \
---target llama-7B-128K --on_chip 9 --seed 1
+test/offloading_TP.py --budget 12264 --prefill 130048 --dataset lwm \
+--target lwm-128K --on_chip 10 --gamma 16
 
-# TriForce w/o CUDA Graph
-CUDA_VISIBLE_DEVICES=8,9 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
-test/offloading_TP.py --budget 12288 --prefill 130048 --dataset demo \
---target llama-7B-128K --on_chip 9 --seed 1 --gamma 16
+# TriForce w/ Tree
+CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
+test/offloading_seqouia.py --budget 12288 --prefill 130048 --dataset gs \
+--target llama-7B-128K --on_chip 9
 ```
+
+### Offloading without Tensor Parallelism
+We recommend to use 2x RTX-4090 for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX-4090, you can still run the following command. 
+
+```bash
+# TriForce w/ Hierarchy, CUDA Graph
+# Huggingface backend, and cuda graph may take some extra HBM
+CUDA_VISIBLE_DEVICES=0 python test/offloading.py --prefill 130048 \
+--chunk_size 8 --temp 0.6 --top_p 0.9 --gamma 12 --dataset gs \
+--budget 8192 --target llama-7B-128K
+
+# TriForce w/ Hierarchy
+CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
+test/offloading_TP.py --budget 8192 --prefill 130048 --dataset gs \
+--target llama-7B-128K --on_chip 0 --gamma 12
+
+# TriForce w/ Tree
+CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
+test/offloading_seqouia.py --budget 8192 --prefill 130048 \
+--dataset gs --target llama-7B-128K --on_chip 0
+```
+
 
 ### Baseline
 We provide the auto-regressive baseline implementation for comparison.
 
 ```bash
-CUDA_VISIBLE_DEVICES=8,9 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
-test/offloading_seqouia.py --prefill 130048 --dataset demo \
---target llama-7B-128K --on_chip 12 --seed 1 --baseline
+# 2x RTX-4090
+CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
+test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
+--target lwm-128K --on_chip 13 --baseline
+
+# 1x RTX-4090
+CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
+test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
+--target lwm-128K --on_chip 2 --baseline
 ```
 
 ## Citation

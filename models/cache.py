@@ -541,12 +541,16 @@ class DistributedRetrievalCache:
         key_ = key_.permute(0, 1, 3, 2, 4)
         result_tensor = torch.gather(key_, 1, expanded_index_tensor) # (bsz, select_sets, 32, chunk_size, head_dim)
         # (bsz, select_sets, 32, chunk_size, head_dim) --> (bsz, select_sets*chunk_size, 32, head_dim)
-        self.key_cache[layer_idx][:,:self.max_budget] = result_tensor.permute(0, 1, 3, 2, 4).reshape(1, self.select_sets*self.chunk_size, self.num_heads, self.head_dim).clone()
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+        self.key_cache[layer_idx][:,:self.max_budget].copy_(result_tensor.permute(0, 1, 3, 2, 4).reshape(1, self.select_sets*self.chunk_size, self.num_heads, self.head_dim))
 
         value_ = value_cache[:, :self.prefill].reshape(1, self.chunks, self.chunk_size, self.num_heads, self.head_dim)
         value_ = value_.permute(0, 1, 3, 2, 4)
         result_tensor = torch.gather(value_, 1, expanded_index_tensor)
-        self.value_cache[layer_idx][:,:self.max_budget] = result_tensor.permute(0, 1, 3, 2, 4).reshape(1, self.select_sets*self.chunk_size, self.num_heads, self.head_dim).clone()
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+        self.value_cache[layer_idx][:,:self.max_budget].copy_(result_tensor.permute(0, 1, 3, 2, 4).reshape(1, self.select_sets*self.chunk_size, self.num_heads, self.head_dim))
 
         if layer_idx == self.layers-1:
             self.init_graph = True

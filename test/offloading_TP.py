@@ -113,6 +113,7 @@ else:
         all_latency.append(latency)
         if local_rank == 0:
             print(colored(f"\n[TriForce] average latency: {latency} s", "red"))
+            print(colored(f"[TriForce] average accepted tokens: {avg_tokens}", "red"))
     if local_rank == 0:
         print(f"[Overall Latency]: {np.array(all_latency).mean()}")
         print(f"[Overall Avg Accepted Tokens]: {np.array(all_avg_tokens).mean()}")

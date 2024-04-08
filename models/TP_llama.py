@@ -69,8 +69,8 @@ class DistributedLlama:
         
         if kv_offload:
             assert bsz == 1
-            self.kv_cache =  DistributedSimpleCache(self.config, max_budget=prefill+gen_len+16, device=self.device, on_chip_layers=on_chip_layers, ssl=ssl)
-            self.kv_buffer = [DistributedKVCacheBuffer(self.config, max_budget=prefill+gen_len+16, device=self.device) for _ in range(2)]
+            self.kv_cache =  DistributedSimpleCache(self.config, max_budget=prefill+gen_len+32, device=self.device, on_chip_layers=on_chip_layers, ssl=ssl)
+            self.kv_buffer = [DistributedKVCacheBuffer(self.config, max_budget=prefill+gen_len+32, device=self.device) for _ in range(2)]
             self.retrieval_cache = DistributedRetrievalCache(self.config, max_budget=retrieval_budget, device=self.device, prefill=prefill, chunk_size=retrieval_chunk_size, gamma=gamma)
         else:
             raise NotImplementedError
@@ -116,11 +116,11 @@ class DistributedLlama:
     @torch.inference_mode()
     def draft_run(self, input_ids: torch.LongTensor, gamma_offset: int=0, probs=True, temperature=0.6, top_p=0.9):
         if input_ids.shape[-1] > 64: # prefill
-            iter_prefill = math.ceil(input_ids.shape[1] / 64)
+            iter_prefill = math.ceil(input_ids.shape[1] / 128)
             for i in range(iter_prefill):
-                self.draft_cache.evict_prefill(64)
+                self.draft_cache.evict_prefill(128)
                 logits = self.draft(
-                    input_ids=input_ids[:, i*64:(i+1)*64],
+                    input_ids=input_ids[:, i*128:(i+1)*128],
                     kv_cache=self.draft_cache,
                     graph_cache=None,
                 ).logits
