@@ -33,8 +33,6 @@
 <figcaption>TriForce Framework</figcaption>
 </div>
 
-![](static/videos/TriForce.mp4)
-
 ## Environment Set Up
 ```bash
 pip install -r requirements.txt
