@@ -59,8 +59,8 @@ Our framework supports tensor parallelism for offloading setting. The `--nproc_p
 ```bash
 # TriForce w/ Hierarchy
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
-test/offloading_TP.py --budget 12264 --prefill 130048 --dataset gs \
---target llama-7B-128K --on_chip 10 --gamma 16
+test/offloading_TP.py --budget 12288 --prefill 130048 --dataset gs \
+--target llama-7B-128K --on_chip 9 --gamma 16
 
 # TriForce w/ Tree
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
@@ -98,7 +98,7 @@ We provide the auto-regressive baseline implementation for comparison. We recomm
 # 2x RTX-4090
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
 test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
---target lwm-128K --on_chip 13 --baseline
+--target lwm-128K --on_chip 12 --baseline
 
 # 1x RTX-4090
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
