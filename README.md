@@ -24,7 +24,7 @@
 <br>
 <div align="center">
 <img src="static/images/TriForce.gif" align="top"/>
-<figcaption>serving <a href="https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K">LWM-Text-Chat-128K</a> with offloading on 2x RTX-4090s (prefill 127K contexts)</figcaption>
+<figcaption>serving <a href="https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K">LWM-Text-Chat-128K</a> with offloading on 2x RTX 4090s (prefill 127K contexts)</figcaption>
 </div>
 <br>
 
@@ -54,7 +54,7 @@ CUDA_VISIBLE_DEVICES=0 python test/on_chip.py --prefill 124928 --budget 4096 \
 #### Offloading with Tensor Parallelism
 For the offloading setting,  we provides two distinct variants of TriForce: TriForce-Tree and TriForce-Hierarchy. TriForce-Tree drafts with tree attention, while TriForce-Hierarchy drafts hierarchically. The difference between them is that the former uses [Seqouia](https://github.com/Infini-AI-Lab/Sequoia) for tree attention, while the latter uses the vanilla attention with hierarchical speculations. The performance of offloading significantly relies on bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
 
-Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX-4090s do not support CUDA Graph for tensor parallelism (while A100 supports). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The default tree size is set to 512. 
+Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX 4090s do not support CUDA Graph for tensor parallelism (while A100 supports). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The default tree size is set to 512. 
 
 ```bash
 # TriForce w/ Hierarchy
@@ -69,7 +69,7 @@ test/offloading_seqouia.py --budget 12288 --prefill 130048 --dataset gs \
 ```
 
 #### Offloading without Tensor Parallelism
-We recommend to use 2x RTX-4090 for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX-4090, you can still run the following command. Since the budget is smaller, the avergae accepted token length is shorter.
+We recommend to use 2x RTX 4090s for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX 4090, you can still run the following command. Since the budget is smaller, the avergae accepted token length is shorter.
 
 ```bash
 # TriForce w/ Hierarchy, CUDA Graph
@@ -92,15 +92,15 @@ test/offloading_seqouia.py --budget 8192 --prefill 130048 \
 
 
 #### Baseline
-For offloading, we provide an implementation of the auto-regressive baseline for comparison purposes. If the performance of TriForce does not meet expectations, which may be due to low PCIE bandwidth, we advise evaluating the baseline's performance on identical hardware. To demonstrate how to execute the baseline with different hardware configurations, here are the commands for running it on two RTX-4090 GPUs and separately on a single RTX-4090 GPU.
+For offloading, we provide an implementation of the auto-regressive baseline for comparison purposes. If the performance of TriForce does not meet expectations, which may be due to low PCIE bandwidth, we advise evaluating the baseline's performance on identical hardware. To demonstrate how to execute the baseline with different hardware configurations, here are the commands for running it on two RTX 4090 GPUs and separately on a single RTX 4090 GPU.
 
 ```bash
-# 2x RTX-4090
+# 2x RTX 4090s
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
 test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
 --target lwm-128K --on_chip 12 --baseline
 
-# 1x RTX-4090
+# 1x RTX 4090
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
 test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
 --target lwm-128K --on_chip 2 --baseline
