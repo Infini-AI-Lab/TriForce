@@ -10,7 +10,7 @@
 <b>Zhuoming Chen</b><sup>1</sup>,
 <b>Xinyu Yang</b><sup>1</sup>,
 <b>Yuandong Tian</b><sup>2</sup>,
-<b>Beidi Chen</b><sup>1,2</sup>,
+<b>Beidi Chen</b><sup>1,2</sup>
 </div>
 
 <div align="center">
@@ -24,7 +24,7 @@
 <br>
 <div align="center">
 <img src="static/images/TriForce.gif" align="top"/>
-<figcaption>serving <a href="https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K">LWM-Text-Chat-128K</a> with offloading on 2x RTX-4090 (prefill 127K contexts)</figcaption>
+<figcaption>serving <a href="https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K">LWM-Text-Chat-128K</a> with offloading on 2x RTX-4090s (prefill 127K contexts)</figcaption>
 </div>
 <br>
 
@@ -50,8 +50,8 @@ On-chip results can be reproduced on A100 by running the following command. `--p
 CUDA_VISIBLE_DEVICES=0 python test/on_chip.py --prefill 124928 --budget 4096 \
  --chunk_size 8 --top_p 0.9 --temp 0.6 --gamma 6
 ```
-
-### Offloading with Tensor Parallelism
+### Offloading
+#### Offloading with Tensor Parallelism
 For the offloading setting,  we provides two distinct variants of TriForce: TriForce-Tree and TriForce-Hierarchy. TriForce-Tree drafts with tree attention, while TriForce-Hierarchy drafts hierarchically. The difference between them is that the former uses [Seqouia](https://github.com/Infini-AI-Lab/Sequoia) for tree attention, while the latter uses the vanilla attention with hierarchical speculations. The performance of offloading significantly relies on bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
 
 Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX-4090s do not support CUDA Graph for tensor parallelism (while A100 supports). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The default tree size is set to 512. 
@@ -68,7 +68,7 @@ test/offloading_seqouia.py --budget 12288 --prefill 130048 --dataset gs \
 --target llama-7B-128K --on_chip 9
 ```
 
-### Offloading without Tensor Parallelism
+#### Offloading without Tensor Parallelism
 We recommend to use 2x RTX-4090 for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX-4090, you can still run the following command. Since the budget is smaller, the avergae accepted token length is shorter.
 
 ```bash
@@ -91,8 +91,8 @@ test/offloading_seqouia.py --budget 8192 --prefill 130048 \
 ```
 
 
-### Baseline
-We provide the auto-regressive baseline implementation for comparison. We recommend to measure the performance of the baseline on the same hardware as the TriForce if you found the performance of the TriForce is not as expected (which maybe you have low PCIE bandwidth). The following command demonstrates how to run the baseline on 2x RTX-4090 and 1x RTX-4090.
+#### Baseline
+For offloading, we provide an implementation of the auto-regressive baseline for comparison purposes. If the performance of TriForce does not meet expectations, which may be due to low PCIE bandwidth, we advise evaluating the baseline's performance on identical hardware. To demonstrate how to execute the baseline with different hardware configurations, here are the commands for running it on two RTX-4090 GPUs and separately on a single RTX-4090 GPU.
 
 ```bash
 # 2x RTX-4090
