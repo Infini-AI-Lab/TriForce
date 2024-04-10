@@ -10,7 +10,7 @@ def build_chat_input_lwm(tokenizer, message, prefill=127*1024):
     # chat format:
     # single-turn: You are a helpful assistant. USER: {} \n ASSISTANT:
     book = tokenizer.encode(message)[:prefill-84]
-    prompt = "You are a helpful assistant. USER: Please read a part of the book below, and then give me the summary.\n[start of the book]\n" + tokenizer.decode(book, skip_special_tokens=True) + "\n[end of the book]\n\nNow you have read it. Please summarize it for me. First, tell me the title and the author, and then tell the story in 500 words.\n\nASSISTANT: "
+    prompt = "You are a helpful assistant. USER: Please read a part of the book below, and then give me the summary.\n[start of the book]\n" + tokenizer.decode(book, skip_special_tokens=True) + "\n[end of the book]\n\nNow you have read it. Please summarize it for me. First, tell me the title and the author, and then tell the story in 400 words.\n\nASSISTANT: "
     input_tokens = tokenizer.encode(prompt, return_tensors="pt")
     return input_tokens
 

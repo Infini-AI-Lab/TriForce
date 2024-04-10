@@ -43,7 +43,7 @@ pip install flash-attn --no-build-isolation # install flash-attn
 Currently, only long-context Llama models are supported (including [Llama2-7B-128K](https://huggingface.co/NousResearch/Yarn-Llama-2-7b-128k), [Llama2-13B-128K](https://huggingface.co/NousResearch/Yarn-Llama-2-13b-128k), [LWM-Text-128K](https://huggingface.co/LargeWorldModel/LWM-Text-128K), [LWM-Text-Chat-128K](https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K)).
 
 ### On-Chip
-On-chip results can be reproduced on A100 by running the following command. `--prefill` specifies the context length of prompt and `--budget` specifies the budget of retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters. `gamma` is the number of speculative decoding steps.
+On-chip results can be reproduced on A100 by running the following command. `--prefill` specifies the context length of prompt and `--budget` specifies the budget of retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters, which are set to 0.9 and 0.6 by default. `gamma` is the number of speculative decoding steps. You should observe a 2.2x speedup by running the following command on a single A100.
 
 ```bash
 # TriForce w/ Hierarchy, on A100
@@ -59,8 +59,8 @@ Our framework supports tensor parallelism for offloading setting. The `--nproc_p
 ```bash
 # TriForce w/ Hierarchy
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
-test/offloading_TP.py --budget 12264 --prefill 130048 --dataset lwm \
---target lwm-128K --on_chip 10 --gamma 16
+test/offloading_TP.py --budget 12264 --prefill 130048 --dataset gs \
+--target llama-7B-128K --on_chip 10 --gamma 16
 
 # TriForce w/ Tree
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
@@ -69,7 +69,7 @@ test/offloading_seqouia.py --budget 12288 --prefill 130048 --dataset gs \
 ```
 
 ### Offloading without Tensor Parallelism
-We recommend to use 2x RTX-4090 for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX-4090, you can still run the following command. 
+We recommend to use 2x RTX-4090 for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX-4090, you can still run the following command. Since the budget is smaller, the avergae accepted token length is shorter.
 
 ```bash
 # TriForce w/ Hierarchy, CUDA Graph
@@ -78,12 +78,13 @@ CUDA_VISIBLE_DEVICES=0 python test/offloading.py --prefill 130048 \
 --chunk_size 8 --temp 0.6 --top_p 0.9 --gamma 12 --dataset gs \
 --budget 8192 --target llama-7B-128K
 
-# TriForce w/ Hierarchy
+# TriForce w/ Hierarchy, overlapping computation and loading
+# overlapping may take some extra HBM
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
 test/offloading_TP.py --budget 8192 --prefill 130048 --dataset gs \
 --target llama-7B-128K --on_chip 0 --gamma 12
 
-# TriForce w/ Tree
+# TriForce w/ Tree, overlapping computation and loading
 CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
 test/offloading_seqouia.py --budget 8192 --prefill 130048 \
 --dataset gs --target llama-7B-128K --on_chip 0
@@ -91,7 +92,7 @@ test/offloading_seqouia.py --budget 8192 --prefill 130048 \
 
 
 ### Baseline
-We provide the auto-regressive baseline implementation for comparison.
+We provide the auto-regressive baseline implementation for comparison. We recommend to measure the performance of the baseline on the same hardware as the TriForce if you found the performance of the TriForce is not as expected (which maybe you have low PCIE bandwidth). The following command demonstrates how to run the baseline on 2x RTX-4090 and 1x RTX-4090.
 
 ```bash
 # 2x RTX-4090

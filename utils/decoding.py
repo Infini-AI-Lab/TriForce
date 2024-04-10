@@ -349,7 +349,7 @@ def TriForce_Dist(tokenizer, llm, input_ids, gamma=4, max_len=256, top_k=-1, top
             # broadcast the random number
             torch.distributed.broadcast(r, src=0)
             dist.barrier()
-            if r < torch.min(torch.tensor([1], device=r.device), (verify_prob[i] / speculation_prob[i])):
+            if r <= torch.min(torch.tensor([1], device=r.device), (verify_prob[i] / speculation_prob[i])):
                 count += 1
                 accepted_count += 1
                 n += 1
@@ -361,6 +361,8 @@ def TriForce_Dist(tokenizer, llm, input_ids, gamma=4, max_len=256, top_k=-1, top
                 # if eos
                 if tokenizer.eos_token_id == i:
                     draft_count -= gamma2 - count
+                    if llm.local_rank == 0:
+                        print('[EOS]')
                     break
             else:
                 resample_count += 1
@@ -373,7 +375,12 @@ def TriForce_Dist(tokenizer, llm, input_ids, gamma=4, max_len=256, top_k=-1, top
                 break
 
             if tokenizer.eos_token_id == pred_token_idx:
+                if llm.local_rank == 0:
+                    print('[EOS]')
                 break
+
+        if tokenizer.eos_token_id == pred_token_idx:
+            break
 
         # update 7b cache
         llm.kv_cache.seq_len -= (len(generated_ids) - count)
