@@ -19,7 +19,7 @@
 </div>
 
 <div align="center">
-[<a href="https://arxiv.org/abs/2404.XXXX">Paper</a>] | [<a href="https://infini-ai-lab.github.io/TriForce">Blog</a>]
+[<a href="https://arxiv.org/abs/2404.11912">Paper</a>] | [<a href="https://infini-ai-lab.github.io/TriForce">Blog</a>]
 </div>
 <br>
 <div align="center">
