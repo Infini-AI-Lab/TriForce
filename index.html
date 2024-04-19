@@ -7,7 +7,7 @@
   <meta name="description" content="TriForce: Lossless Acceleration of Long Sequence Generation with Hierarchical Speculative Decoding">
   <meta property="og:title" content="TriForce"/>
   <meta property="og:description" content="TriForce: Lossless Acceleration of Long Sequence Generation with Hierarchical Speculative Decoding"/>
-  <meta property="og:url" content="https://infini-ai-lab.github.io/TriForce/"/>
+  <meta property="og:url" content="https://Infini-AI-Lab.github.io/TriForce/"/>
   <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
   <meta property="og:image" content="static/images/proj_fig.png" />
   <meta property="og:image:width" content="1200"/>
@@ -96,7 +96,7 @@
                 
                 <!-- ArXiv abstract Link -->
                 <span class="link-block">
-                    <a href="https://arxiv.org/abs/2402.12374" target="_blank"
+                    <a href="https://arxiv.org/abs/2404.11912" target="_blank"
                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                         <i class="ai ai-arxiv"></i>
@@ -118,7 +118,7 @@
 
                 <!-- Video Link -->
                 <span class="link-block">
-                    <a href="https://www.youtube.com/watch?v=JN0J1v2Nl1Y" target="_blank"
+                    <a href="https://youtu.be/vRAaAyjr6Jo" target="_blank"
                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                         <i class="fab fa-youtube"></i>
@@ -140,10 +140,10 @@
   <div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <h2 class="title is-3"><img src="static/images/Llama.png" style="height: 43px; display: inline; vertical-align:text-top;"/>&nbsp; Introduction</h2>
+        <h2 class="title is-3" style="text-align: center;"><img src="static/images/Llama.png" style="height: 43px; display: inline; vertical-align:text-top;"/>&nbsp; Introduction</h2>
         <div class="content has-text-justified">
           <p>
-            With LLMs widely deployed in long content generation recently, KV cache has emerged as a critical bottleneck by growing linearly in size with the sequence length (e.g., <b>Llama2-7B-128K has 64GB KV cache and 14GB model weights</b>). We present <b>TriForce</b>,  a scalable and robust hierarchical speculative decoding system that enables serving long-context LLMs (Llamma2-7B-128K, LWM-Text-Chat-128K, Llama2-13B-128K, etc.) for long sequence generation with <b>0.1s</b> latency per token on consumer GPUs losslessly (<b>16bit</b> precision, preserving the original output distribution). We demonstrate that TriForce can efficiently serve a <b>Llama2-13B with 128K</b> contexts on two <b>RTX 4090s</b>, reaching an average time between tokens (TBT) as low as <b>0.22 seconds</b>, which is <b>8x faster</b> than a highly optimized offloading system. Furthermore, with TriForce, <b>Llama2-7B-128K</b> can be served on two RTX 4090s with a TBT of <b>0.11s—only 0.5x slower than on one A100</b>. Apart from offloading, TriForce provides a <b>on-chip solution for data-center GPUs like A100</b>, which is discussed in detail in our <a style="color: #209CEE" href="https://arxiv.org/abs/2402.XXX" target="_blank">paper</a>.
+            With LLMs widely deployed in long content generation recently, KV cache has emerged as a critical bottleneck by growing linearly in size with the sequence length (e.g., <b>Llama2-7B-128K has 64GB KV cache and 14GB model weights</b>). We present <b>TriForce</b>,  a scalable and robust hierarchical speculative decoding system that enables serving long-context LLMs (Llamma2-7B-128K, LWM-Text-Chat-128K, Llama2-13B-128K, etc.) for long sequence generation with <b>0.1s</b> latency per token on consumer GPUs losslessly (<b>16-bit</b> precision, preserving the original output distribution). We demonstrate that TriForce can efficiently serve a <b>Llama2-13B with 128K</b> contexts on two <b>RTX 4090s</b>, reaching an average time between tokens (TBT) as low as <b>0.22 seconds</b>, which is <b>7.8x faster</b> than a highly optimized offloading system. Furthermore, with TriForce, <b>Llama2-7B-128K</b> can be served on two RTX 4090s with a TBT of <b>0.11s—only 0.5x slower than on one A100</b>. Additionally, TriForce performs <b>4.86x than DeepSpeed-Zero-Inference on a single RTX 4090 GPU</b>. Apart from offloading, TriForce provides an <b>on-chip solution for data-center GPUs like A100</b>, which is discussed in detail in our <a style="color: #209CEE" href="https://arxiv.org/abs/2404.11912" target="_blank">paper</a>.
             
           </p>
         </div>
@@ -156,23 +156,21 @@
     <div class="container is-max-desktop">
         <div class="columns is-centered has-text-centered">
             <div class="column is-four-fifths">
+                <h2 class="title is-3" style="text-align: center;"><img src="static/images/GPU.png" style="height: 50px; display: inline; vertical-align: middle;"/>&nbsp; Long Sequence Generation with TriForce</h2>
                 <div class="content has-text-justified">
-                    <center>
-                    <h2 class="title is-3" ><img src="static/images/GPU.png" style="height: 50px; display: inline; vertical-align: middle;"/>&nbsp; Long Sequence Generation with TriForce</h2>
-                    </center>
                     <p>
                         TriForce enhances the efficiency of generating long sequences across a range of models. Our evaluation of TriForce includes LLMs such as 
-                        <a style="color: #209CEE" href="https://huggingface.co/NousResearch/Yarn-Llama-2-7b-128k">Llama2-7B-128K</a>, <a style="color: #209CEE" href="https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K">LWM-Text-Chat-128K</a>, and 
-                        <a style="color: #209CEE" href="https://huggingface.co/NousResearch/Yarn-Llama-2-13b-128k">Llama2-13B-128K</a> on RTX 4090s, prompted by <a style="color: #209CEE" href="https://huggingface.co/datasets/emozilla/pg19-test">PG-19</a> and <a style="color: #209CEE" href="https://huggingface.co/datasets/narrativeqa">NarrativeQA</a>. Here we provide two distinct variants of TriForce: <i>TriForce-Tree</i> and <i>TriForce-Hierarchy</i>. The former leverages tree attention to achieve more accepted tokens, while the latter employs a lightweight model designed for hierarchical speculations to more quickly generate draft tokens.
+                        <a style="color: #209CEE" href="https://huggingface.co/NousResearch/Yarn-Llama-2-7b-128k">Llama2-7B-128K</a>, <a style="color: #209CEE" href="https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K">LWM-Text-Chat-128K</a> and <a style="color: #209CEE" href="https://huggingface.co/NousResearch/Yarn-Llama-2-13b-128k">Llama2-13B-128K</a> on RTX4090s, prompted by <a style="color: #209CEE" href="https://huggingface.co/datasets/emozilla/pg19-test">PG-19</a> and <a style="color: #209CEE" href="https://huggingface.co/datasets/narrativeqa">NarrativeQA</a>. The entries marked with an asterisk represent the baseline using DeepSpeed-ZeRO-Inference. The official implementation of DeepSpeed-ZeRO-Inference with KV cache offloading currently only supports a single GPU,
+                        which computes attention on CPU. Our offloading system transfers KV cache from CPU to GPU, benefiting from Tensor Parallelism.
                     </p>
 
                     <table>
                     <tr> 
                         <th scope="col">GPU</th>
                         <th>Target Model</th>
-                        <th>TriForce-Tree (ms)</th>
-                        <th>TriForce-Hierarchy  (ms)</th>
+                        <th>TriForce (ms)</th>
                         <th>Baseline (ms)</th>
+                        <th>Speedup</th>
                     </tr>
                     <!-- <tr>
                         <th>1x A100</th>
@@ -182,43 +180,43 @@
                         <td>54</td>
                     </tr> -->
                     <tr>
-                        <th>2x 4090</th>
+                        <th>2x 4090s</th>
                         <td>Llama2-7B-128K</td>
-                        <td>133</td>
                         <td>108</td>
                         <td>840</td>
+                        <td>7.78x</td>
                     </tr>
                     <tr>
-                        <th>2x 4090</th>
+                        <th>2x 4090s</th>
                         <td>LWM-Text-Chat-128K</td>
-                        <td>140</td>
                         <td>114</td>
                         <td>840</td>
+                        <td>7.37x</td>
                     </tr>
                     <tr>
-                        <th>2x 4090</th>
+                        <th>2x 4090s</th>
                         <td>Llama2-13B-128K</td>
-                        <td>220</td>
                         <td>226</td>
                         <td>1794</td>
+                        <td>7.94x</td>
                     </tr>
                     <tr>
                         <th>1x 4090</th>
                         <td>Llama2-7B-128K</td>
-                        <td>295</td>
                         <td>312</td>
-                        <td>2434</td>
+                        <td>1516*</td>
+                        <td>4.86x</td>
                     </tr>
                     <tr>
                         <th>1x 4090</th>
                         <td>LWM-Text-Chat-128K</td>
-                        <td>300</td>
                         <td>314</td>
-                        <td>2434</td>
+                        <td>1516*</td>
+                        <td>4.83x</td>
                     </tr>
                     </table>
                     <br>
-                    <h4 class="title is-5" ><img src="static/images/demo.png" style="height: 36px; display: inline; vertical-align: middle;"/>&nbsp; Summarize a Book of 127K Tokens with 10 Tokens/s</h4>
+                    <h4 class="title is-5" ><img src="static/images/demo.png" style="height: 36px; display: inline; vertical-align: middle;"/>&nbsp; Summarize a Book of 127K Tokens</h4>
                     <p>
                     Here we present a demo for LWM-Text-Chat-128K inference on two RTX 4090s with 127K contexts (with and without TriForce). We prefill the model with 127K tokens from a book in NarrativeQA, directing the model to summarize the book's content. The video is displayed at normal speed (1x).
                     </p>
@@ -235,45 +233,81 @@
     </div>
 </section>
 <!-- End Solutions -->
-  
-<!-- Why -->
+
+<!-- TriForce -->
 <section class="section hero is-light">
 <div class="container is-max-desktop">
     <div class="columns is-centered">
         <div class="column is-four-fifths">
+            <h2 class="title is-3" style="text-align: center;"><img src="static/images/Hierarchy.png" style="height: 50px; display: inline; vertical-align: middle;"/>&nbsp; TriForce: Hierarchical Speculative Decoding</h2>
             <div class="content has-text-justified">
-            <center>
-            <h2 class="title is-3"><img src="static/images/Hierarchy.png" style="height: 50px; display: inline; vertical-align: middle;"/>&nbsp; TriForce: Hierarchical Speculative Decoding</h2>
-            </center>
                 <p>
-                    TriForce effectively addresses the challenge while provably preserving model quality by integrating <b>Retrieval-based Drafting</b> and <b>Hierarchical Speculation</b>. This approach leverages the original model weights and a small proportion of KV cache from retrieval as a draft model, which is further speculated by a lightweight model with StreamingLLM cache to reduce drafting latency. By mitigating the dual bottlenecks associated with KV cache and model weights, it significantly accelerates long-context LLM serving with offloading.
+                    TriForce effectively addresses the challenge while provably preserving model quality by integrating <b>retrieval-based drafting</b> and <b>hierarchical speculation</b>. This approach leverages the original model weights and a small proportion of KV cache from retrieval as a draft model, which is further speculated by a lightweight model with StreamingLLM cache to reduce drafting latency. By mitigating the dual bottlenecks associated with KV cache and model weights, it significantly accelerates long-context LLM serving with offloading.
                 </p>
 
                 <p>
-                Moreover, in our <a style="color: #209CEE" href="https://arxiv.org/abs/2402.XXX" target="_blank">paper</a> we show that: (1) TriForce is <b>scalable</b> with longer contexts. This scalability is attributed to its high acceptance rate and the growing gap between the draft and the target model's latencies since we keep the constant KV cache budget for drafting; (2) TriForce is <b>robust</b> in terms of sampling temperatures, maintaining an acceptance rate above 0.9 even when the temperature is 1.0.
+                Moreover, in our <a style="color: #209CEE" href="https://arxiv.org/abs/2404.11912" target="_blank">paper</a>, we show that: (1) TriForce is <b>scalable</b> with longer contexts. This scalability is attributed to its high acceptance rate and the growing gap between the draft and the target model's latencies since we keep the constant KV cache budget for drafting; (2) TriForce is <b>robust</b> in terms of sampling temperatures, maintaining an acceptance rate above 0.9 even when the temperature is 1.0.
                 </p>
             </div>
             <div class="figure">
                 <img src="static/images/sys.png" alt="TriForce System" height="400" />
             </div>
             <br>
-            <p>As the figure illustrates, for a long-context target model (e.g., Llama2-7B-128K), we leverage the original model weights but only with a small proportion (e.g., <b>3%</b>) of KV cache as a draft to tackle <b>the bottleneck of KV cache</b>. Hierarchically, the draft model is further speculated by a lightweight model (e.g., Llama-68M) with StreamingLLM cache to address <b>the bottleneck of model weights</b>. Therefore, TriForce integrates two models and three caches, comprising a draft model, a target model, a StreamingLLM cache for the draft model, alongside a retrieval cache and a full cache for the target model. The process initiates by repeatedly drafting for <math><msub><mi>γ</mi><mn>1</mn></msub></math> steps, assisting the target model with retrieved partial KV cache in generating over <math><msub><mi>γ</mi><mn>2</mn></msub></math> tokens, which will be further verified by target model using full KV cache. By establishing this sequential speculation hierarchy, we effectively reduce the latency associated with drafting, thereby accelerating the end-to-end inference.
+            <p>As the figure illustrates, for a long-context target model (e.g., Llama2-7B-128K), we leverage the original model weights but only with a small proportion (e.g., <b>3%</b>) of KV cache as a draft to tackle <b>the bottleneck of KV cache</b>. Hierarchically, the draft model is further speculated by a lightweight model (e.g., Llama-68M) with StreamingLLM cache to address <b>the bottleneck of model weights</b>. Therefore, TriForce integrates two models and three caches, comprising a draft model, a target model, a StreamingLLM cache for the draft model, alongside a retrieval cache and a full cache for the target model. The process initiates by repeatedly drafting for <math><msub><mi>γ</mi><mn>1</mn></msub></math> steps, assisting the target model with retrieved partial KV cache in generating over <math><msub><mi>γ</mi><mn>2</mn></msub></math> tokens, which will be further verified by target model using full KV cache.
             </p>
         </div>
     </div>
 </div>
 </section>
-<!-- End Why -->
-  
-<!-- Discussion -->
 <section class="section hero is-light">
-  <div class="container is-max-desktop">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered">
+            <div class="column is-four-fifths">
+                <h2 class="title is-3" style="text-align: center;"><img src="static/images/Idea.png" style="height: 50px; display: inline; vertical-align: middle;"/>&nbsp; Motivation of TriForce</h2>
+                <div class="content has-text-justified">
+                <p>Our design of TriForce is inspired by three critical empirical observations regarding LLMs when dealing with long contexts, detailed as follows.</p>
+                <h4 class="title is-5" ><img src="static/images/Observation.png" style="height: 36px; display: inline; vertical-align: middle;"/>&nbsp; Leveraging Attention Sparsity for Speculative Decoding</h4>
+                <p>
+                    As shown in the figure below, the Llama2-7B-128K model demonstrates significant attention sparsity with a 120K context. We observe that with a context length of 120K, it is possible to recover over 96% of the attention score with merely 4K tokens across almost all layers. The presence of sparsity within the attention blocks suggests that <b>a fraction of KV cache could serve as a draft cache to attain a high acceptance rate during self-speculative decoding</b>.
+                </p>
+                <div class="figure">
+                    <img src="static/images/retrieval.png" alt="Retrieval-based Drafting" height="400" />
+                </div>
+                <p>
+                    The necessity of keeping the entire KV cache in our settings allows us to select KV cache freely. In our approach, KV cache is segmented into small chunks. During the retrieval phase, we calculate the attention between a given query and the average key cache within each chunk. This method effectively highlights the most relevant chunks, enabling us to gather KV cache with a fixed budget based on the scores. By focusing on relevance over recency, retrieval-based policy demonstrates its potential to handle contextually dense datasets.
+                </p>
+                <h4 class="title is-5" ><img src="static/images/Fast.png" style="height: 36px; display: inline; vertical-align: middle;"/>&nbsp; Exploiting Contextual Locality for Drafting Efficiency</h4>
+                <div style="display: flex; align-items: top; gap: 10px;">
+                    <div style="flex: 1;">
+                        <p>
+                            Our exploration reveals that the information from long context tokens needed by adjacent tokens tends to be similar. With the context length established at 120K, we instruct the model to generate 256 tokens. By choosing the top-4K indices according to the attention scores of the last prefilled token, we use these indices to gather attention scores for the subsequently generated tokens and assess the score's recovery rate for the initially prefilled 120K tokens. It leads to high recovery across most layers and a slowly decreasing trend as the number of tokens increases.
+                        </p>
+                    </div>
+                    <div style="flex: 0 0 40%; max-width: 50%;">
+                        <img src="static/images/locality.png" alt="Locality" width=300 />
+                    </div>
+                </div>
+                <p>
+                    This observation allows for <b>a single construction of the cache to suffice for multiple decoding steps, thereby amortizing the latency of constructing draft cache and boosting efficiency</b>. As new KV cache are introduced, guided by the understanding that recent words are more strongly correlated with the tokens currently being decoded, these entries will replace the less significant ones. Cache re-building operations can be scheduled at regular intervals or adaptively in response to a drop in the acceptance rate, which ensures that the cache remains dynamically aligned with the evolving context.
+                </p>
+                <h4 class="title is-5" ><img src="static/images/Hierarchical.png" style="height: 36px; display: inline; vertical-align: middle;"/>&nbsp; Hierarchical Speculation</h4>
+                <p>While addressing the KV cache bottleneck enhances efficiency, the requirement to load whole model weights for drafting reintroduces latency, <b>shifting the bottleneck to model weights again</b>. To tackle this challenge, we implement a hierarchical system. This system employs a secondary, lightweight model with StreamingLLM cache to perform initial speculations for our target model with retrieval-based draft cache (which serves as a draft model for the target model with full KV cache). By establishing this sequential speculation hierarchy, we effectively reduce the latency associated with drafting, thereby accelerating the overall inference.</p>
+
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<section class="section hero is-light">
+<div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
         <h2 class="title is-3"><img src="static/images/Telescope.png" style="height: 50px; display: inline; vertical-align: middle;"/>&nbsp; Conclusion and Future Work</h2>
         <div class="content has-text-justified">
         <p>
-            Leveraging the TriForce framework, anyone can host a chatbot capable of processing long texts up to 128K or even 1M tokens without approximation on consumer GPUs, such as the RTX 4090, making long-context LLMs more accessible to a wide audience. Additionally, it can be further integrated with various works on KV compression (e.g., KV quantization), enhancing its performance. Our hierarchical speculative decoding algorithm is specifically designed to be highly adaptable, catering to the diverse and evolving memory hierarchies of future hardware. TriForce precisely bridges memory hierarchy gaps, adapting alongside the hardware community to optimize performance.
+            Leveraging the TriForce framework, anyone can host a chatbot capable of processing long texts up to 128K or even 1M tokens without approximation on consumer GPUs, such as the RTX 4090, making long-context LLMs more accessible to a wide audience. TriForce can be further deployed on robots, expanding their ability to understand and interact using long-context conversations. Additionally, it can be further integrated with various works on KV compression (e.g., KV quantization), enhancing its performance. Our hierarchical speculative decoding algorithm is specifically designed to be highly adaptable, catering to the diverse and evolving memory hierarchies of future hardware. TriForce precisely bridges memory hierarchy gaps, adapting alongside the hardware community to optimize performance.
           </p>
         </div>
        <div class="figure">
@@ -287,7 +321,7 @@
     </div>
   </div>
 </section>
-<!-- Disucssion -->
+
   
 <!--BibTex citation -->
   <section class="section" id="BibTeX">
@@ -296,7 +330,7 @@
       <pre><code>@article{sun2024TriForce,
   title={TriForce: Lossless Acceleration of Long Sequence Generation with Hierarchical Speculative Decoding},
   author={Sun, Hanshi and Chen, Zhuoming and Yang, Xinyu and Tian, Yuandong and Chen, Beidi},
-  journal={arXiv preprint arXiv:2404.XXXX},
+  journal={arXiv preprint arXiv:2404.11912},
   year={2024}
 }</code></pre>
     </div>
@@ -321,12 +355,5 @@
     </div>
   </div>
 </footer>
-
-<!-- Statcounter tracking code -->
-  
-<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
-
-    <!-- End of Statcounter Code -->
-
-  </body>
-  </html>
+</body>
+</html>
