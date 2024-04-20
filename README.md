@@ -65,7 +65,7 @@ test/offloading_TP.py --budget 12288 --prefill 130048 --dataset gs \
 ```
 
 #### Offloading without Tensor Parallelism
-We recommend to use 2x RTX 4090s for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX 4090, you can still run the following command. Since the budget is smaller, the avergae accepted token length is shorter.
+We recommend to use 2x RTX 4090s for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX 4090, you can still run the following command. Since the budget is smaller, the average accepted token length is shorter.
 
 ```bash
 # TriForce, CUDA Graph
