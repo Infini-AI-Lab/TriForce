@@ -3,7 +3,7 @@
 </h1>
 
 
-**trainig-free, accelerate long sequence generation**
+**training-free, accelerate long sequence generation**
 </div>
 <div align="center">
 <b>Hanshi Sun</b><sup>1</sup>,
@@ -46,7 +46,7 @@ pip install flash-attn --no-build-isolation # install flash-attn
 Currently, only long-context Llama models are supported (including [Llama2-7B-128K](https://huggingface.co/NousResearch/Yarn-Llama-2-7b-128k), [Llama2-13B-128K](https://huggingface.co/NousResearch/Yarn-Llama-2-13b-128k), [LWM-Text-128K](https://huggingface.co/LargeWorldModel/LWM-Text-128K), [LWM-Text-Chat-128K](https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K)).
 
 ### On-Chip
-On-chip results can be reproduced on A100 by running the following command. `--prefill` specifies the context length of prompt and `--budget` specifies the budget of retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters, which are set to 0.9 and 0.6 by default. `gamma` is the number of speculative decoding steps. You should observe a 2.2x speedup by running the following command on a single A100. `gs` contains 20 samples from PG-19, `128k` contains 128K samples, and `lwm` contains samples from NarrativeQA
+On-chip results can be reproduced on A100 by running the following command. `--prefill` specifies the context length of prompt and `--budget` specifies the budget of retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters, which are set to 0.9 and 0.6 by default. `gamma` is the number of speculative decoding steps. You should observe a 2.2x speedup by running the following command on a single A100. `gs` contains 20 samples from PG-19, `128k` contains 128K samples, and `lwm` contains samples from NarrativeQA.
 
 ```bash
 # TriForce, on A100
@@ -58,7 +58,7 @@ CUDA_VISIBLE_DEVICES=0 python test/on_chip.py --prefill 124928 --budget 4096 \
 Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX 4090s do not support CUDA Graph for tensor parallelism (while A100 supports). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The performance of offloading significantly relies on bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
 
 ```bash
-# TriForce
+# TriForce, on 2x RTX 4090 GPUs
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
 test/offloading_TP.py --budget 12288 --prefill 130048 --dataset gs \
 --target llama-7B-128K --on_chip 9 --gamma 16
@@ -86,12 +86,12 @@ test/offloading_TP.py --budget 8192 --prefill 130048 --dataset gs \
 For offloading, we provide an implementation of the auto-regressive baseline for comparison purposes. If the performance of TriForce does not meet expectations, which may be due to low PCIE bandwidth, we advise evaluating the baseline's performance on identical hardware. To demonstrate how to execute the baseline with different hardware configurations, here are the commands for running it on two RTX 4090 GPUs and separately on a single RTX 4090 GPU.
 
 ```bash
-# 2x RTX 4090s
+# baseline, 2x RTX 4090s
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=2 \
 test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
 --target lwm-128K --on_chip 12 --baseline
 
-# 1x RTX 4090
+# baseline, 1x RTX 4090
 CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=48 torchrun --nproc_per_node=1 \
 test/offloading_TP.py --budget 0 --prefill 130048 --dataset demo \
 --target lwm-128K --on_chip 2 --baseline
