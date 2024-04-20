@@ -3,7 +3,7 @@
 </h1>
 
 
-**trainig-free, accelerate long sequence generation**
+**training-free, accelerate long sequence generation**
 </div>
 <div align="center">
 <b>Hanshi Sun</b><sup>1</sup>,
