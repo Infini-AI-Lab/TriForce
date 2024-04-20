@@ -6,11 +6,11 @@
 **training-free, accelerate long sequence generation**
 </div>
 <div align="center">
-<b>Hanshi Sun</b><sup>1</sup>,
-<b>Zhuoming Chen</b><sup>1</sup>,
-<b>Xinyu Yang</b><sup>1</sup>,
-<b>Yuandong Tian</b><sup>2</sup>,
-<b>Beidi Chen</b><sup>1,2</sup>
+<b><a href="https://github.com/preminstrel">Hanshi Sun</a></b><sup>1</sup>,
+<b><a href="https://github.com/dreaming-panda">Zhuoming Chen</a></b><sup>1</sup>,
+<b><a href="https://github.com/Hanyuezhuohua">Xinyu Yang</a></b><sup>1</sup>,
+<b><a href="https://github.com/yuandong-tian">Yuandong Tian</a></b><sup>2</sup>,
+<b><a href="https://github.com/keroro824">Beidi Chen</a></b><sup>1,2</sup>
 </div>
 
 <div align="center">
@@ -46,7 +46,7 @@ pip install flash-attn --no-build-isolation # install flash-attn
 Currently, only long-context Llama models are supported (including [Llama2-7B-128K](https://huggingface.co/NousResearch/Yarn-Llama-2-7b-128k), [Llama2-13B-128K](https://huggingface.co/NousResearch/Yarn-Llama-2-13b-128k), [LWM-Text-128K](https://huggingface.co/LargeWorldModel/LWM-Text-128K), [LWM-Text-Chat-128K](https://huggingface.co/LargeWorldModel/LWM-Text-Chat-128K)).
 
 ### On-Chip
-On-chip results can be reproduced on A100 by running the following command. `--prefill` specifies the context length of prompt and `--budget` specifies the budget of retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters, which are set to 0.9 and 0.6 by default. `gamma` is the number of speculative decoding steps. You should observe a 2.2x speedup by running the following command on a single A100. `gs` contains 20 samples from PG-19, `128k` contains 128K samples, and `lwm` contains samples from NarrativeQA.
+On-chip results can be reproduced on an A100 by running the following command. `--prefill` specifies the context length of the prompt, and `--budget` specifies the budget of the retrieval cache. `chunk_size` specifies the chunk size of the KV cache. `top_p` and `temp` are the sampling hyperparameters, which are set to 0.9 and 0.6 by default. `gamma` is the number of speculative decoding steps. You should observe a 2.2x speedup by running the following command on a single A100. `gs` contains 20 samples from PG-19, `128k` contains 128K samples, and `lwm` contains samples from NarrativeQA.
 
 ```bash
 # TriForce, on A100
@@ -55,7 +55,7 @@ CUDA_VISIBLE_DEVICES=0 python test/on_chip.py --prefill 124928 --budget 4096 \
 ```
 ### Offloading
 #### Offloading with Tensor Parallelism
-Our framework supports tensor parallelism for offloading setting. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX 4090s do not support CUDA Graph for tensor parallelism (while A100 supports). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can adjusted based on hardware. The performance of offloading significantly relies on bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
+Our framework supports tensor parallelism for offloading settings. The `--nproc_per_node` should be set to the number of GPUs used for offloading. The following command demonstrates how to use tensor parallelism with 2 GPUs. It should be noted that RTX 4090s do not support CUDA Graph for tensor parallelism (while A100 does). Therefore, we disabled CUDA Graph for this setting. `--on_chip` specifies the number of layers' KV cache that are on-chip, which can be adjusted based on hardware. The performance of offloading significantly depends on the bandwidth of PCIE. In order to get accurate results, it is best to ensure that the bandwidth is not used by other programs.
 
 ```bash
 # TriForce, on 2x RTX 4090 GPUs
@@ -65,7 +65,7 @@ test/offloading_TP.py --budget 12288 --prefill 130048 --dataset gs \
 ```
 
 #### Offloading without Tensor Parallelism
-We recommend to use 2x RTX 4090s for offloading setting since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX 4090, you can still run the following command. Since the budget is smaller, the avergae accepted token length is shorter.
+We recommend using 2x RTX 4090s for offloading since the encoding time is much shorter and the generation latency is lower. But if you only have 1x RTX 4090, you can still run the following command. Since the budget is smaller, the average accepted token length is shorter.
 
 ```bash
 # TriForce, CUDA Graph
