@@ -108,3 +108,8 @@ If you find TriForce useful or relevant to your project and research, please kin
   year={2024}
 }
 ```
+
+## FAQ
+1. Environment Issues
+
+Ensure you are using `transformers==4.37.2` because the apply_rotary_pos_emb API has changed in more recent versions of transformers. Additionally, some environment issues (e.g., incompatibility with the latest flash-attn) can be resolved by setting  `torch==2.2.1+cu121` and `flash_attn==2.5.7`. For more details, please refer to [issue #7](https://github.com/Infini-AI-Lab/TriForce/issues/7).
