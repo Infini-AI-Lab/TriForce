@@ -102,7 +102,7 @@ If you find TriForce useful or relevant to your project and research, please kin
 
 ```bibtex
 @article{sun2024triforce,
-  title={TriForce: Lossless Acceleration of Long Sequence Generation with Hierarchical Speculative Decoding},
+  title={Triforce: Lossless acceleration of long sequence generation with hierarchical speculative decoding},
   author={Sun, Hanshi and Chen, Zhuoming and Yang, Xinyu and Tian, Yuandong and Chen, Beidi},
   journal={arXiv preprint arXiv:2404.11912},
   year={2024}
