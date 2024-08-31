@@ -156,7 +156,7 @@ class LlamaAttention(nn.Module):
             query_states = query_states.transpose(1, 2)
             key_states = key_states.transpose(1, 2)
 
-            position_ids = torch.arange(graph_cache.real_budget-graph_cache.gamma-1, graph_cache.real_budget-graph_cache.gamma+gamma_offset, device=position_ids.device).unsqueeze(0)
+            position_ids = torch.arange(graph_cache.real_budget-graph_cache.gamma-3, graph_cache.real_budget-graph_cache.gamma+gamma_offset-2, device=position_ids.device).unsqueeze(0)
             query_states = apply_rotary_pos_emb_single(query_states, cos, sin, position_ids)
             key_position_ids = torch.arange(kv_seq_len, device=position_ids.device).unsqueeze(0)
             key_states = apply_rotary_pos_emb_single(key_states, cos, sin, key_position_ids)
